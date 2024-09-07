@@ -1,4 +1,4 @@
-module llmbridge
+module github.com/icelain/llmbridge
 
 go 1.23.0
 
