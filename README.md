@@ -1,5 +1,5 @@
 # llmbridge
 
-Go LLM wrapper with generalized extendable abstractions
+Go LLM interface with generalized extendable abstractions
 
 Currently somewhat supports ollama
