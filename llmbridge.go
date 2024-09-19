@@ -7,7 +7,7 @@ import (
 )
 
 type LLMClient interface {
-	StreamResponse(ctx context.Context, query string, to chan<- string)
+	StreamResponse(ctx context.Context, query string) <-chan string
 }
 
 type DefaultLLMClient struct {
@@ -15,22 +15,25 @@ type DefaultLLMClient struct {
 	model        string
 }
 
-func (dl *DefaultLLMClient) StreamResponse(ctx context.Context, query string, to chan<- string) {
+func (dl *DefaultLLMClient) StreamResponse(ctx context.Context, query string) <-chan string{
 
+	to := make(chan string)
 	request := &ollama.GenerateRequest{
 
 		Model:  dl.model,
 		Prompt: query,
 	}
 
-	dl.ollamaclient.Generate(ctx, request, func(generatedResponse ollama.GenerateResponse) error {
+	defer func(){dl.ollamaclient.Generate(ctx, request, func(generatedResponse ollama.GenerateResponse) error {
 
 		to <- generatedResponse.Response
 		return nil
 
 	})
 
-	close(to)
+	close(to)}()
+
+	return to
 
 }
 
